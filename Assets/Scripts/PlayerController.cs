@@ -5,51 +5,39 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private Rigidbody2D _rb;
-    [SerializeField]
-    private float _moveSpeed = 10.0f;
-    [SerializeField]
-    private float _spriteRotationOffset = 0;
+    public float rotationSpeed = 30f;
 
-    private bool _shouldMoveForward = false;
+    private PlayerInputs _inputs;
+
+    private void Awake()
+    {
+        _inputs = new PlayerInputs();
+        if (_inputs == null)
+            Debug.LogError("There is no RigidBody on the Player!!!!");
+
+        _inputs.Ship.Enable();
+    }
 
     private void Update()
     {
-        if(Keyboard.current.spaceKey.isPressed)
-        {
-            _shouldMoveForward = true;
-        }
-        else if (Keyboard.current.spaceKey.wasReleasedThisFrame)
-        {
-            _shouldMoveForward = false;
-        }
-
-        LookAtMousePointer();
-    }
-
-    private void FixedUpdate()
-    {
-        if (_shouldMoveForward)
-        {
-            _rb.velocity = -transform.up * _moveSpeed;
-        }
-        else
-        {
-            _rb.velocity = Vector2.zero;
-        }
-    }
-
-    private void LookAtMousePointer()
-    {
-        var mouse = Mouse.current;
-        if (mouse == null)
-            return;
-
-        var mousePos = Camera.main.ScreenToWorldPoint(mouse.position.ReadValue());
-        var direction = (Vector2)mousePos - _rb.position;
-        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + _spriteRotationOffset;
-
-        _rb.rotation = angle;
+        var rotation = _inputs.Ship.Turn.ReadValue<float>();
+        transform.Rotate(Vector3.forward * Time.deltaTime * rotationSpeed * rotation);
     }
 }
+
+
+//[SerializeField]
+//private Rigidbody2D _rb;
+//private float _spriteRotationOffset = 0;
+//private void LookAtMousePointer()
+//{
+//    var mouse = Mouse.current;
+//    if (mouse == null)
+//        return;
+
+//    var mousePos = Camera.main.ScreenToWorldPoint(mouse.position.ReadValue());
+//    var direction = (Vector2)mousePos - _rb.position;
+//    var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + _spriteRotationOffset;
+
+//    _rb.rotation = angle;
+//}
