@@ -5,23 +5,50 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public float rotationSpeed = 30f;
+    [SerializeField]
+    private Ship _ship;
 
     private PlayerInputs _inputs;
 
-    private void Awake()
+    private void Start()
     {
         _inputs = new PlayerInputs();
         if (_inputs == null)
             Debug.LogError("There is no RigidBody on the Player!!!!");
-
         _inputs.Ship.Enable();
+
+        _ship = GameObject.Find("Ship").gameObject.GetComponent<Ship>();
+        if (_ship == null)
+            Debug.LogError("There is no Ship for the PLayerController!!!!");
+        InitializeInputs();
     }
 
     private void Update()
     {
         var rotation = _inputs.Ship.Turn.ReadValue<float>();
-        transform.Rotate(Vector3.forward * Time.deltaTime * rotationSpeed * rotation);
+        _ship.RotateShip(rotation);
+    }
+
+    private void InitializeInputs()
+    {
+        _inputs.Ship.Anchor.performed += Anchor_performed;
+        _inputs.Ship.SailsUp.performed += SailsUp_performed;
+        _inputs.Ship.SailsDown.performed += SailsDown_performed;
+    }
+
+    private void SailsDown_performed(InputAction.CallbackContext obj)
+    {
+        _ship.SetSails(true);
+    }
+
+    private void SailsUp_performed(InputAction.CallbackContext obj)
+    {
+        _ship.SetSails(false);
+    }
+
+    private void Anchor_performed(InputAction.CallbackContext obj)
+    {
+        _ship.SetAnchor();
     }
 }
 

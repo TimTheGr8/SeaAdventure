@@ -37,9 +37,18 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Sails"",
+                    ""name"": ""SailsUp"",
                     ""type"": ""Button"",
                     ""id"": ""fe5bc8d6-9df7-4ce3-8693-e0d5692910b9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SailsDown"",
+                    ""type"": ""Button"",
+                    ""id"": ""1f281e77-5f7e-4f3f-ab42-e2214a740668"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -101,37 +110,26 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""1D Axis"",
-                    ""id"": ""619fe072-554d-4388-8e50-16b8b1ba4f1c"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Sails"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""8f331c97-4950-4885-a0f3-274dc88cd27e"",
+                    ""name"": """",
+                    ""id"": ""8f34a73e-ec88-43fd-86f8-11e02c6a5fc7"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Sails"",
+                    ""action"": ""SailsUp"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""positive"",
-                    ""id"": ""ab0c6c1a-6cf4-4a3a-9dc3-5b843a17debc"",
+                    ""name"": """",
+                    ""id"": ""56979d54-5000-452d-ba10-eab8006d69bd"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Sails"",
+                    ""action"": ""SailsDown"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -141,7 +139,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         // Ship
         m_Ship = asset.FindActionMap("Ship", throwIfNotFound: true);
         m_Ship_Turn = m_Ship.FindAction("Turn", throwIfNotFound: true);
-        m_Ship_Sails = m_Ship.FindAction("Sails", throwIfNotFound: true);
+        m_Ship_SailsUp = m_Ship.FindAction("SailsUp", throwIfNotFound: true);
+        m_Ship_SailsDown = m_Ship.FindAction("SailsDown", throwIfNotFound: true);
         m_Ship_Anchor = m_Ship.FindAction("Anchor", throwIfNotFound: true);
     }
 
@@ -205,14 +204,16 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Ship;
     private List<IShipActions> m_ShipActionsCallbackInterfaces = new List<IShipActions>();
     private readonly InputAction m_Ship_Turn;
-    private readonly InputAction m_Ship_Sails;
+    private readonly InputAction m_Ship_SailsUp;
+    private readonly InputAction m_Ship_SailsDown;
     private readonly InputAction m_Ship_Anchor;
     public struct ShipActions
     {
         private @PlayerInputs m_Wrapper;
         public ShipActions(@PlayerInputs wrapper) { m_Wrapper = wrapper; }
         public InputAction @Turn => m_Wrapper.m_Ship_Turn;
-        public InputAction @Sails => m_Wrapper.m_Ship_Sails;
+        public InputAction @SailsUp => m_Wrapper.m_Ship_SailsUp;
+        public InputAction @SailsDown => m_Wrapper.m_Ship_SailsDown;
         public InputAction @Anchor => m_Wrapper.m_Ship_Anchor;
         public InputActionMap Get() { return m_Wrapper.m_Ship; }
         public void Enable() { Get().Enable(); }
@@ -226,9 +227,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Turn.started += instance.OnTurn;
             @Turn.performed += instance.OnTurn;
             @Turn.canceled += instance.OnTurn;
-            @Sails.started += instance.OnSails;
-            @Sails.performed += instance.OnSails;
-            @Sails.canceled += instance.OnSails;
+            @SailsUp.started += instance.OnSailsUp;
+            @SailsUp.performed += instance.OnSailsUp;
+            @SailsUp.canceled += instance.OnSailsUp;
+            @SailsDown.started += instance.OnSailsDown;
+            @SailsDown.performed += instance.OnSailsDown;
+            @SailsDown.canceled += instance.OnSailsDown;
             @Anchor.started += instance.OnAnchor;
             @Anchor.performed += instance.OnAnchor;
             @Anchor.canceled += instance.OnAnchor;
@@ -239,9 +243,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Turn.started -= instance.OnTurn;
             @Turn.performed -= instance.OnTurn;
             @Turn.canceled -= instance.OnTurn;
-            @Sails.started -= instance.OnSails;
-            @Sails.performed -= instance.OnSails;
-            @Sails.canceled -= instance.OnSails;
+            @SailsUp.started -= instance.OnSailsUp;
+            @SailsUp.performed -= instance.OnSailsUp;
+            @SailsUp.canceled -= instance.OnSailsUp;
+            @SailsDown.started -= instance.OnSailsDown;
+            @SailsDown.performed -= instance.OnSailsDown;
+            @SailsDown.canceled -= instance.OnSailsDown;
             @Anchor.started -= instance.OnAnchor;
             @Anchor.performed -= instance.OnAnchor;
             @Anchor.canceled -= instance.OnAnchor;
@@ -265,7 +272,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     public interface IShipActions
     {
         void OnTurn(InputAction.CallbackContext context);
-        void OnSails(InputAction.CallbackContext context);
+        void OnSailsUp(InputAction.CallbackContext context);
+        void OnSailsDown(InputAction.CallbackContext context);
         void OnAnchor(InputAction.CallbackContext context);
     }
 }
