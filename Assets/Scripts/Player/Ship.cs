@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Ship : MonoBehaviour
 {
@@ -14,16 +15,21 @@ public class Ship : MonoBehaviour
     private GameObject _main_Sail_Down;
     [SerializeField]
     private GameObject _main_Sail_Up;
+    [SerializeField]
+    private GameObject _dinghy;
+    [SerializeField]
+    private Transform _deployPosition;
 
     private bool _anchorDown = false;
     private bool _sailsDown = false;
     private float _currentSpeed = 0f;
     private float _destinationSpeed = 0f;
+    private Dinghy _dinghyScript;
     
     void Start()
     {
         if (_rb == null)
-            Debug.LogError("There is no RigidBody on the ship!!!!");
+            Debug.LogError($"There is no RigidBody on the {gameObject.name}!!!!");
     }
 
     void FixedUpdate()
@@ -69,6 +75,23 @@ public class Ship : MonoBehaviour
         {
             _destinationSpeed = _moveSpeed;
             StartCoroutine(SetShipSpeed());
+        }
+    }
+
+    public void DeployDinghy()
+    {
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+        if (hit.collider != null && hit.collider.tag == "Land")
+        {
+            GameObject deployedDinghy = Instantiate(_dinghy, _deployPosition.position, Quaternion.identity);
+            _dinghyScript = deployedDinghy.GetComponent<Dinghy>();
+            // Checking if dinghy script is null
+            if (_dinghyScript == null)
+                Debug.LogError($"There is not Dinghy script on the {gameObject.name}!!!!");
+           else 
+                _dinghyScript.SetDestination(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         }
     }
 

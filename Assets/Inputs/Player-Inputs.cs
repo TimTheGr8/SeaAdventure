@@ -62,6 +62,15 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SendDinghy"",
+                    ""type"": ""Button"",
+                    ""id"": ""0bca1a3b-fcfa-4ee3-82ed-aa352fb55157"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -130,6 +139,17 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""action"": ""SailsDown"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c94f4b8d-0111-46de-8cc6-7a622c385a61"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SendDinghy"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -142,6 +162,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         m_Ship_SailsUp = m_Ship.FindAction("SailsUp", throwIfNotFound: true);
         m_Ship_SailsDown = m_Ship.FindAction("SailsDown", throwIfNotFound: true);
         m_Ship_Anchor = m_Ship.FindAction("Anchor", throwIfNotFound: true);
+        m_Ship_SendDinghy = m_Ship.FindAction("SendDinghy", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +228,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     private readonly InputAction m_Ship_SailsUp;
     private readonly InputAction m_Ship_SailsDown;
     private readonly InputAction m_Ship_Anchor;
+    private readonly InputAction m_Ship_SendDinghy;
     public struct ShipActions
     {
         private @PlayerInputs m_Wrapper;
@@ -215,6 +237,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         public InputAction @SailsUp => m_Wrapper.m_Ship_SailsUp;
         public InputAction @SailsDown => m_Wrapper.m_Ship_SailsDown;
         public InputAction @Anchor => m_Wrapper.m_Ship_Anchor;
+        public InputAction @SendDinghy => m_Wrapper.m_Ship_SendDinghy;
         public InputActionMap Get() { return m_Wrapper.m_Ship; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -236,6 +259,9 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Anchor.started += instance.OnAnchor;
             @Anchor.performed += instance.OnAnchor;
             @Anchor.canceled += instance.OnAnchor;
+            @SendDinghy.started += instance.OnSendDinghy;
+            @SendDinghy.performed += instance.OnSendDinghy;
+            @SendDinghy.canceled += instance.OnSendDinghy;
         }
 
         private void UnregisterCallbacks(IShipActions instance)
@@ -252,6 +278,9 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Anchor.started -= instance.OnAnchor;
             @Anchor.performed -= instance.OnAnchor;
             @Anchor.canceled -= instance.OnAnchor;
+            @SendDinghy.started -= instance.OnSendDinghy;
+            @SendDinghy.performed -= instance.OnSendDinghy;
+            @SendDinghy.canceled -= instance.OnSendDinghy;
         }
 
         public void RemoveCallbacks(IShipActions instance)
@@ -275,5 +304,6 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         void OnSailsUp(InputAction.CallbackContext context);
         void OnSailsDown(InputAction.CallbackContext context);
         void OnAnchor(InputAction.CallbackContext context);
+        void OnSendDinghy(InputAction.CallbackContext context);
     }
 }

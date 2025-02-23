@@ -14,12 +14,12 @@ public class PlayerController : MonoBehaviour
     {
         _inputs = new PlayerInputs();
         if (_inputs == null)
-            Debug.LogError("There is no RigidBody on the Player!!!!");
+            Debug.LogError("There is no PlayerInputs on the Player!!!!");
         _inputs.Ship.Enable();
 
-        _ship = GameObject.Find("Ship").gameObject.GetComponent<Ship>();
+        _ship = GameObject.Find("Player").gameObject.GetComponent<Ship>();
         if (_ship == null)
-            Debug.LogError("There is no Ship for the PLayerController!!!!");
+            Debug.LogError("There is no Ship for the PlayerController!!!!");
         InitializeInputs();
     }
 
@@ -34,6 +34,12 @@ public class PlayerController : MonoBehaviour
         _inputs.Ship.Anchor.performed += Anchor_performed;
         _inputs.Ship.SailsUp.performed += SailsUp_performed;
         _inputs.Ship.SailsDown.performed += SailsDown_performed;
+        _inputs.Ship.SendDinghy.performed += SendDinghy_performed;
+    }
+
+    private void SendDinghy_performed(InputAction.CallbackContext obj)
+    {
+        _ship.DeployDinghy();
     }
 
     private void SailsDown_performed(InputAction.CallbackContext obj)
