@@ -19,17 +19,28 @@ public class Ship : MonoBehaviour
     private GameObject _dinghy;
     [SerializeField]
     private Transform _deployPosition;
-
+    
     private bool _anchorDown = false;
     private bool _sailsDown = false;
     private float _currentSpeed = 0f;
     private float _destinationSpeed = 0f;
     private Dinghy _dinghyScript;
-    
+    [SerializeField]
+    private List<string> _resourcesList = new List<string>();
+    //{"Food", "Cannon Balls", "Wood", "Crew"};
+    [SerializeField]
+    private List<int> _resourceMax = new List<int>();
+    //{15, 20, 10, 8}; // Food, Cannon Balls, Wood, Crew
+    [SerializeField]
+    private List<int> _resourceQuantity = new List<int>();
+    //{15, 20, 10, 8}; // Food, Cannon Balls, Wood, Crew
+
     void Start()
     {
         if (_rb == null)
             Debug.LogError($"There is no RigidBody on the {gameObject.name}!!!!");
+
+        FillResources();
     }
 
     void FixedUpdate()
@@ -43,6 +54,47 @@ public class Ship : MonoBehaviour
         }
 
         _rb.velocity = (transform.up * -1) * _currentSpeed;
+    }
+
+    private void FillResources()
+    {
+        // Fill the Resources List
+        _resourcesList.Add("Food");
+        _resourcesList.Add("Cannon Balls");
+        _resourcesList.Add("Wood");
+        _resourcesList.Add("Crew");
+        // Set the max quantites with the max amount
+        _resourceMax.Add(15); // Food
+        _resourceMax.Add(20); // Cannon Balls
+        _resourceMax.Add(10); // Wood
+        _resourceMax.Add(8); // Crew Mates
+        // Assing the current quantities with the max
+        for (int i = 0; i < _resourceMax.Count; i++) 
+        {
+            _resourceQuantity.Add(_resourceMax[i]);
+        }
+    }
+
+    public void AddResources(int index, int quantity)
+    {
+        _resourceQuantity[index] += quantity;
+        if(_resourceQuantity[index] > _resourceMax[index])
+            _resourceQuantity[index] = _resourceMax[index];
+    }
+
+    public string GetResourceName(int index)
+    {
+        return _resourcesList[index];
+    }
+
+    public int GetResourceCount()
+    {
+        return _resourcesList.Count;
+    }
+
+    public int GetResourceMax(int index)
+    {
+        return _resourceMax[index];
     }
 
     public void RotateShip(float rotation)
