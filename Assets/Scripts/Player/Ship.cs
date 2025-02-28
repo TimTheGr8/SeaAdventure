@@ -16,6 +16,8 @@ public class Ship : MonoBehaviour
     [SerializeField]
     private GameObject _main_Sail_Up;
     [SerializeField]
+    private int _deploymentMax = 2;
+    [SerializeField]
     private GameObject _dinghy;
     [SerializeField]
     private Transform _deployPosition;
@@ -25,6 +27,8 @@ public class Ship : MonoBehaviour
     private float _currentSpeed = 0f;
     private float _destinationSpeed = 0f;
     private Dinghy _dinghyScript;
+    [SerializeField]
+    private int _currentDeployment = 0;
     [SerializeField]
     private List<string> _resourcesList = new List<string>();
     //{"Food", "Cannon Balls", "Wood", "Crew"};
@@ -71,7 +75,7 @@ public class Ship : MonoBehaviour
         // Assing the current quantities with the max
         for (int i = 0; i < _resourceMax.Count; i++) 
         {
-            _resourceQuantity.Add(_resourceMax[i]);
+            _resourceQuantity.Add(_resourceMax[i] - 5);
         }
     }
 
@@ -132,19 +136,28 @@ public class Ship : MonoBehaviour
 
     public void DeployDinghy()
     {
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-
-        if (hit.collider != null && hit.collider.tag == "Land")
+        if(_currentDeployment < _deploymentMax)
         {
-            GameObject deployedDinghy = Instantiate(_dinghy, _deployPosition.position, Quaternion.identity);
-            _dinghyScript = deployedDinghy.GetComponent<Dinghy>();
-            // Checking if dinghy script is null
-            if (_dinghyScript == null)
-                Debug.LogError($"There is not Dinghy script on the {gameObject.name}!!!!");
-           else 
-                _dinghyScript.SetDestination(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+            if (hit.collider != null && hit.collider.tag == "Land")
+            {
+                GameObject deployedDinghy = Instantiate(_dinghy, _deployPosition.position, Quaternion.identity);
+                _dinghyScript = deployedDinghy.GetComponent<Dinghy>();
+                if (_dinghyScript == null)
+                    Debug.LogError($"There is not Dinghy script on the {gameObject.name}!!!!");
+                else
+                    _dinghyScript.SetDestination(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+
+                _currentDeployment++;
+            }
         }
+    }
+
+    public void DinghyReturn()
+    {
+        _currentDeployment--;
     }
 
     IEnumerator SetShipSpeed()

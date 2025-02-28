@@ -11,6 +11,14 @@ public class Dinghy : MonoBehaviour
     private float _maxSpeed = 2;
     [SerializeField]
     private float _resourceGatherTime = 1.0f;
+    [SerializeField]
+    Ship _shipScript;
+    [SerializeField]
+    int _resourceCount = 0;
+    [SerializeField]
+    List<int> _resourceType = new List<int>();
+    [SerializeField]
+    private int _resourceQuantity = 0;
 
     private GameObject _ship;
     private Vector3 _dinghyDestination;
@@ -28,7 +36,11 @@ public class Dinghy : MonoBehaviour
             Debug.LogError($"There is no Collider2D on the {gameObject.name}!!!!");
         _ship = GameObject.Find("Player");
         if (_ship == null)
-            Debug.LogError("There is no ship for me to return to!!!!");
+            Debug.LogError($"{gameObject.name} has no ship for me to return to!!!!");
+
+        _shipScript = _ship.GetComponent<Ship>();
+        if(_shipScript  == null)
+            Debug.LogError($"There is no Ship Script on the {gameObject.name}!!!!");
     }
 
     private void FixedUpdate()
@@ -43,14 +55,22 @@ public class Dinghy : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Land"))
         {
-            //_rb.velocity = Vector2.zero;
             _speed = 0;
             StartCoroutine(GatherResources());
         }
 
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player") && _shipScript != null)
         {
-            AddResources();
+            // Choose the quantities of each resource
+            foreach (int resource in _resourceType)
+            {
+                _resourceQuantity = Random.Range(1, _shipScript.GetResourceMax(resource) + 1);
+                _shipScript.AddResources(resource, _resourceQuantity);
+
+            }
+            _shipScript.DinghyReturn();
+
+            Destroy(this.gameObject);
         }
     }
 
@@ -67,23 +87,18 @@ public class Dinghy : MonoBehaviour
         _speed = _maxSpeed;
     }
 
-    private void AddResources()
-    {
-        Destroy(this.gameObject);
-    }
-
     // Choose how many different resources to collect
     private void ChooseResources()
     {
-        Ship shipScript = _ship.GetComponent<Ship>();
-        int resourceCount = Random.Range(1, shipScript.GetResourceCount() + 1);
-        List<int> resourceType = new List<int>();
         bool resourceInList = false;
+        GetResourceCount();
         // Choose what resources 
-        while (resourceType.Count < resourceCount)
+        while (_resourceType.Count < _resourceCount)
         {
-            int rand = Random.Range(0, shipScript.GetResourceCount());
-            foreach (int resource in resourceType)
+            //TODO: Change this to collect cannon balls more than most resources, wood, food, crew
+            // Use GetResourceCount as an example
+            int rand = Random.Range(0, _shipScript.GetResourceCount());
+            foreach (int resource in _resourceType)
             {
                 if (resource == rand)
                 {
@@ -93,18 +108,30 @@ public class Dinghy : MonoBehaviour
             }
             if (!resourceInList)
             {
-                resourceType.Add(rand);
+                _resourceType.Add(rand);
             }
             resourceInList = false;
         }
-        // Choose the quantities of each resource
-        foreach (int resource in resourceType)
+    }
+
+    private void GetResourceCount()
+    {
+        float rand = Random.Range(0f, 1f);
+        switch (rand)
         {
-            int resourceQuantity = Random.Range(1, shipScript.GetResourceMax(resource) + 1);
-            shipScript.AddResources(resource, resourceQuantity);
-
+            case float n when (n > 0f && n <= 0.45f):
+                _resourceCount = 2;
+                break;
+            case float n when (n > 0.46f && n <= 0.65f):
+                _resourceCount = 1;
+                break;
+            case float n when (n > 0.66f && n <= 0.85f):
+                _resourceCount = 3;
+                break;
+            default:
+                _resourceCount = 4;
+                break;
         }
-
     }
 
     IEnumerator GatherResources()
