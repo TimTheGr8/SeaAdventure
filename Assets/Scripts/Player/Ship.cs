@@ -31,13 +31,13 @@ public class Ship : MonoBehaviour
     private int _currentDeployment = 0;
     [SerializeField]
     private List<string> _resourcesList = new List<string>();
-    //{"Food", "Cannon Balls", "Wood", "Crew"};
+    //{"Cannon Balls", "Wood", "Food", "Crew"};
     [SerializeField]
     private List<int> _resourceMax = new List<int>();
-    //{15, 20, 10, 8}; // Food, Cannon Balls, Wood, Crew
+    //{20, 10, 15, 8}; // Cannon Balls, Wood, Food, Crew
     [SerializeField]
     private List<int> _resourceQuantity = new List<int>();
-    //{15, 20, 10, 8}; // Food, Cannon Balls, Wood, Crew
+    //{20, 10, 15, 8}; // Cannon Balls, Wood, Food, Crew
 
     void Start()
     {
@@ -63,14 +63,14 @@ public class Ship : MonoBehaviour
     private void FillResources()
     {
         // Fill the Resources List
-        _resourcesList.Add("Food");
         _resourcesList.Add("Cannon Balls");
         _resourcesList.Add("Wood");
+        _resourcesList.Add("Food");
         _resourcesList.Add("Crew");
         // Set the max quantites with the max amount
-        _resourceMax.Add(15); // Food
         _resourceMax.Add(20); // Cannon Balls
         _resourceMax.Add(10); // Wood
+        _resourceMax.Add(15); // Food
         _resourceMax.Add(8); // Crew Mates
         // Assing the current quantities with the max
         for (int i = 0; i < _resourceMax.Count; i++) 
@@ -84,6 +84,7 @@ public class Ship : MonoBehaviour
         _resourceQuantity[index] += quantity;
         if(_resourceQuantity[index] > _resourceMax[index])
             _resourceQuantity[index] = _resourceMax[index];
+        Debug.Log($"I collected {_resourcesList[index]}.");
     }
 
     public string GetResourceName(int index)

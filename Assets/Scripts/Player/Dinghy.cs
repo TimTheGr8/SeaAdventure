@@ -16,7 +16,9 @@ public class Dinghy : MonoBehaviour
     [SerializeField]
     int _resourceCount = 0;
     [SerializeField]
-    List<int> _resourceType = new List<int>();
+    private List<int> _resourceType = new List<int>();
+    [SerializeField]
+    private List<int> _resourceLootTable = new List<int> { 60, 25, 15, 5 };
     [SerializeField]
     private int _resourceQuantity = 0;
 
@@ -91,13 +93,13 @@ public class Dinghy : MonoBehaviour
     private void ChooseResources()
     {
         bool resourceInList = false;
-        GetResourceCount();
+        _resourceCount = RandomInt(true);
         // Choose what resources 
         while (_resourceType.Count < _resourceCount)
         {
             //TODO: Change this to collect cannon balls more than most resources, wood, food, crew
             // Use GetResourceCount as an example
-            int rand = Random.Range(0, _shipScript.GetResourceCount());
+            int rand = RandomInt(false);        //Random.Range(0, _shipScript.GetResourceCount());
             foreach (int resource in _resourceType)
             {
                 if (resource == rand)
@@ -114,23 +116,36 @@ public class Dinghy : MonoBehaviour
         }
     }
 
-    private void GetResourceCount()
+    private int RandomInt(bool isResourceCount)
     {
         float rand = Random.Range(0f, 1f);
-        switch (rand)
+        if (isResourceCount)
         {
-            case float n when (n > 0f && n <= 0.45f):
-                _resourceCount = 2;
-                break;
-            case float n when (n > 0.46f && n <= 0.65f):
-                _resourceCount = 1;
-                break;
-            case float n when (n > 0.66f && n <= 0.85f):
-                _resourceCount = 3;
-                break;
-            default:
-                _resourceCount = 4;
-                break;
+            switch (rand)
+            {
+                case float n when (n > 0f && n <= 0.45f):
+                    return 1;
+                case float n when (n > 0.46f && n <= 0.65f):
+                    return 2;
+                case float n when (n > 0.66f && n <= 0.85f):
+                    return 3;
+                default:
+                    return 4;
+            }
+        }
+        else
+        {
+            switch (rand)
+            {
+                case float n when (n > 0f && n <= 0.5f):
+                    return 0;
+                case float n when (n > 0.51f && n <= 0.70f):
+                    return 1;
+                case float n when (n > 0.71f && n <= 0.85f):
+                    return 2;
+                default:
+                    return 3;
+            }
         }
     }
 
