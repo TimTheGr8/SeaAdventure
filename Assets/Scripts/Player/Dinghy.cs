@@ -97,9 +97,7 @@ public class Dinghy : MonoBehaviour
         // Choose what resources 
         while (_resourceType.Count < _resourceCount)
         {
-            //TODO: Change this to collect cannon balls more than most resources, wood, food, crew
-            // Use GetResourceCount as an example
-            int rand = RandomInt(false);        //Random.Range(0, _shipScript.GetResourceCount());
+            int rand = RandomInt(false);
             foreach (int resource in _resourceType)
             {
                 if (resource == rand)
